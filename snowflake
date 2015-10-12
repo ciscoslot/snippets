@@ -1,0 +1,93 @@
+using UnityEngine;
+using System.Collections;
+
+public class SierpinskiHexagon : MonoBehaviour {
+
+    public float a = 3f;
+    public int iterations;
+    public GameObject points;
+
+    float h;
+
+    Vector3 curPoint;
+
+    void Start()
+    {
+        h = 0.5f * Mathf.Sqrt(3f) * a;
+        Vector3 pointA = new Vector3(0f, 0f, -a);
+        Vector3 pointB = new Vector3(h, 0f, -0.5f * a);
+        Vector3 pointC = new Vector3(h, 0f, 0.5f * a);
+        Vector3 pointD = new Vector3(0f, 0f, a);
+        Vector3 pointE = new Vector3(-h, 0f, 0.5f * a);
+        Vector3 pointF = new Vector3(-h, 0f, -0.5f * a);
+        Instantiate(points, pointA, Quaternion.identity);
+        Instantiate(points, pointB, Quaternion.identity);
+        Instantiate(points, pointC, Quaternion.identity);
+        Instantiate(points, pointD, Quaternion.identity);
+        Instantiate(points, pointE, Quaternion.identity);
+        Instantiate(points, pointF, Quaternion.identity);
+
+        curPoint = ChoosePointInTriangle();
+        Instantiate(points, curPoint, Quaternion.identity);
+        
+        for (int i = 0; i < iterations; i++)
+        {
+            int dice = Random.Range(0, 6);
+            if (dice == 0)
+            {
+                MoveToCorner(pointA);
+            }
+            if (dice == 1)
+            {
+                MoveToCorner(pointB);
+            }
+            if (dice == 2)
+            {
+                MoveToCorner(pointC);
+            }
+            if (dice == 3)
+            {
+                MoveToCorner(pointD);
+            }
+            if (dice == 4)
+            {
+                MoveToCorner(pointE);
+            }
+            if (dice == 5)
+            {
+                MoveToCorner(pointF);
+            }
+        }
+        
+    }
+
+    Vector3 ChoosePointInTriangle()
+    {
+        float temp;
+        float rndX = 0f;
+        float rndZ = Random.Range(-a, a);
+        if(rndZ < -0.5f * a)
+        {
+            temp = Mathf.Sqrt(3) * rndZ;
+            rndX = Random.Range(-temp, temp);
+        } else if (rndZ >= -0.5f * a && rndZ <= 0.5f * a)
+        {
+            rndX = Random.Range(-h, h);
+        } else if (rndZ > 0.5f * a)
+        {
+            temp = -1 * Mathf.Sqrt(3) * rndZ + 3 * Mathf.Sqrt(3);
+            rndX = Random.Range(-temp, temp);
+        }
+
+        Vector3 rndPoint = new Vector3(rndX, 0f, rndZ);
+        return rndPoint;
+    }
+
+    void MoveToCorner(Vector3 corner)
+    {
+        Vector3 dir = curPoint + 0.67f * (corner - curPoint);
+        GameObject obj = Instantiate(points, dir, Quaternion.identity) as GameObject;
+        obj.transform.parent = transform;
+        curPoint = dir;
+    }
+}
